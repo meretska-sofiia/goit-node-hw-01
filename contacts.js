@@ -36,6 +36,9 @@ const removeContact = async contactId => {
     const data = await fs.readFile(contactsPath, 'utf8');
     const parseData = JSON.parse(data);
     const index = parseData.findIndex(el => el.id === contactId);
+    if (index < 0) {
+      return console.warn(`\x1B[31m Сontact with id ${contactId} is not in the list`);
+    }
     parseData.splice(index, 1);
     console.table(parseData);
     return await fs.writeFile(contactsPath, JSON.stringify(parseData), 'utf8');
@@ -60,8 +63,13 @@ const addContact = async (name, email, phone) => {
       email,
       phone,
     };
+    const contactsName = parseData.map(el => el.name);
+    if (contactsName.includes(newContact.name)) {
+      return console.warn(`\x1B[31m Contact ${newContact.name} is already in list`);
+    }
     const newContacts = [...parseData, newContact];
     console.table(newContacts);
+
     return await fs.writeFile(contactsPath, JSON.stringify(newContacts), 'utf8');
   } catch (error) {
     console.log(error);
